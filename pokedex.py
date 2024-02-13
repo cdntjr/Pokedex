@@ -28,8 +28,8 @@ pokemon_front_img_load = False
 pokemon_back_img_load = False
 pokemon_name_load = False
 
-type_dic = {'normal':'노말', 'fire':'불꽃', 'water':'물', 'electric':'전기', 'grass':'풀', 'ice':'얼음', 'fighting':'격투', 'poison':'독', 'ground':'땅', 'flying':'비행', 'psychic':'에스퍼', 'bug':'벌레', 'ghost':'고스트', 'dark':'악', 'dragon':'드래곤', 'steel':'강철', 'fairy':'페어리'}
-type_color_dic = {'노말':'255, 255, 255', '불꽃':'225, 127, 0', '물':'0, 127, 255', '전기':'247, 230, 0', '풀':'0, 141, 98', '얼음':'80, 188, 223', '격투':'193, 58, 14', '독':'147, 112, 219', '땅':'198, 138, 18', '비행':'121, 159, 191', '에스퍼':'255, 51, 153', '벌레':'128, 128, 0', '고스트':'75, 0, 130', '악':'72, 61, 139', '드래곤':'83, 83, 236', '강철':'102, 102, 102', '페어리':'128, 0, 128'}
+type_dic = {'normal':'노말', 'fire':'불꽃', 'water':'물', 'electric':'전기', 'grass':'풀', 'ice':'얼음', 'fighting':'격투', 'poison':'독', 'ground':'땅', 'flying':'비행', 'psychic':'에스퍼', 'bug':'벌레', 'ghost':'고스트', 'dark':'악', 'dragon':'드래곤', 'steel':'강철', 'fairy':'페어리', 'rock':'바위'}
+type_color_dic = {'노말':'255, 255, 255', '불꽃':'225, 127, 0', '물':'0, 127, 255', '전기':'247, 230, 0', '풀':'0, 141, 98', '얼음':'80, 188, 223', '격투':'193, 58, 14', '독':'147, 112, 219', '땅':'198, 138, 18', '비행':'121, 159, 191', '에스퍼':'255, 51, 153', '벌레':'128, 128, 0', '고스트':'75, 0, 130', '악':'72, 61, 139', '드래곤':'83, 83, 236', '강철':'102, 102, 102', '페어리':'128, 0, 128', '바위':'215, 184, 123'}
 
 
 def rotation_animation(): # 포켓볼 회전 애니메이션 함수
@@ -161,10 +161,10 @@ type1_color = ()
 type2_color = ()
 type_text_1_font_rate = pygame.font.Font(os.path.join(path, "font.ttf"), int(width/35))
 type_text_1 = type_text_1_font_rate.render("", True, [255, 255, 255])
-type_text_1_rect = (420, 390)
+type_text_1_rect = (450, 390)
 type_text_2_font_rate = pygame.font.Font(os.path.join(path, "font.ttf"), int(width/35))
 type_text_2 = type_text_2_font_rate.render("", True, [255, 255, 255])
-type_text_2_rect = (490, 390)
+type_text_2_rect = (520, 390)
 
 # 능력치
 hp_text_font_size = int(width/36)
@@ -317,10 +317,10 @@ while running:
                 pk_sp_attack = p.base_stats.sp_atk
                 pk_sp_defense = p.base_stats.sp_def
                 pk_speed = p.base_stats.speed
+                pk_ability = p.abilities
                 pk_weight = p.weight
                 pk_height = p.height
                 pk_current_index = 0
-                pk_ability = p.abilities
 
 
                 # 타입 한국어로 변환 + 색깔 반환
@@ -356,14 +356,17 @@ while running:
                 pokemon_front_img = pygame.transform.scale(pokemon_front_img, (front_img_width * 2, front_img_height * 2))
                 pokemon_front_img_load = True
 
-                back_img_url = p.sprites.back['default']
-                pokemon_back_sprite = Image.open(requests.get(back_img_url, stream=True).raw).convert('RGBA')
-                pokemon_back_sprite.save(os.path.join(path,"pokemon_back.png"),'PNG')
+                try: # 오류 방지
+                    back_img_url = p.sprites.back['default']
+                    pokemon_back_sprite = Image.open(requests.get(back_img_url, stream=True).raw).convert('RGBA')
+                    pokemon_back_sprite.save(os.path.join(path,"pokemon_back.png"),'PNG')
 
-                pokemon_back_img = pygame.image.load(os.path.join(path,"pokemon_back.png"))
-                back_img_width, back_img_height = pokemon_back_img.get_size()
-                pokemon_back_img = pygame.transform.scale(pokemon_back_img, (back_img_width * 2, back_img_height * 2))
-                pokemon_back_img_load = True
+                    pokemon_back_img = pygame.image.load(os.path.join(path,"pokemon_back.png"))
+                    back_img_width, back_img_height = pokemon_back_img.get_size()
+                    pokemon_back_img = pygame.transform.scale(pokemon_back_img, (back_img_width * 2, back_img_height * 2))
+                    pokemon_back_img_load = True
+                except:
+                    pokemon_back_img_load = False
 
                 # 능력치, 스펙, 특성
                 hp_text = hp_text_font_rate.render("Hp : " + str(pk_hp), True, (255, 255, 255))
@@ -436,8 +439,11 @@ while running:
         screen.blit(box.image, (55, 127))
 
         # 포켓몬 스프라이트
-        if pokemon_front_img_load == True and pokemon_back_img_load == True:
+        if pokemon_front_img_load == True:
             screen.blit(pokemon_front_img, (100, 170))
+            pokemon_name_load = True
+
+        if pokemon_back_img_load == True:
             screen.blit(pokemon_back_img, (400, 170))
             pokemon_name_load = True
 
